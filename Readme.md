@@ -1,27 +1,38 @@
-zabbix-ipvsadm
+Zabbix IPVSADM Module
 ====
-由 [zabbix_ipvsadm](https://github.com/shinonome/zabbix_ipvsadm) 修改而来
 
-Usage
+Installation
 ----
-* 将ipvsadm_discover.sh 和ipvsadm.py 放置于/etc/zabbix目录中
-* 将ipvsadm.conf放置于/etc/zabbix/zabbix_agentd.conf.d目录中
-* 允许Zabbix用户使用ipvsadm命令（不需要输入密码）
-```
-sed -i '/secure/a\Defaults:zabbix !requiretty' /etc/sudoers
-sed -i '/^root/a\zabbix  ALL=(ALL)   NOPASSWD: /sbin/ipvsadm' /etc/sudoers
+Do the following on the host with zabbix-agent:
 
-```
-* 重启zabbix-agent并且测试
-```
-service zabbix-agent restart
+* Put *ipvsadm_discover.sh* and *ipvsadm.py* in */etc/zabbix*
+* Both files need the following permissions:
+ * mode:   *754*
+ * user:   *root*
+ * group:  *zabbix*
+* Put *ipvsadm.conf* in */etc/zabbix/zabbix_agentd.conf.d/*
+* Rename *zabbix_ipvsadm_sudoers* to *zabbix_ipvsadm* and put it in */etc/sudoers.d/*
+ * DO **NOT** EDIT THE /etc/sudoers FILE AT ALL UNLESS YOU **USE VISUDO** AND KNOW WHAT YOU ARE DOING!
+* Restart the zabbix-agent:   <code>sudo service zabbix-agent restart</code>
 
-zabbix_get -s $IPADDRESS -k ipvsadm.discovery
-```
-* 如果成功则在Zabbix server的Web界面中导入Template_LVS_connections.xml
 
-修改说明：
+Zabbix Server
 ----
-由于 [zabbix_ipvsadm](https://github.com/shinonome/zabbix_ipvsadm)中的ipvsadm_discover.sh脚本获取的格式并非JSON无法被Zabbix所解析，所以进行修改以便zabbix可以正常获取数据
+* To test the functionality
+* On the zabbix server run:  <code>zabbix_get -s $IPADDRESS -k ipvsadm.discovery</code>
+ * REPLACE $IPDADDRESS with the IP 
+* If you get output that does NOT say "Permissions Denied" then it works!.
+* Import the *Template_LVS_connections.xml* template
 
+
+History & Credit
+--------------
+* Major credit goes to Yxnt for fixing the JSON formatting issue which prevented the module from working.
+
+* Forked from Yxnt @ https://github.com/Yxnt/zabbix-ipvsadm.
+* Original Zabbix module from shinonome @ https://github.com/shinonome/zabbix_ipvsadm **(unmaintained)**
+* Original code & concept from shota @ https://www.zabbix.com/forum/showthread.php?t=12086 **(unmaintained)**
+
+Screenshot from the final product on the zabbix server.
 ![](ipvsadm.png)
+Image above is fom Yxnt.
